@@ -1,0 +1,17 @@
+.env
+*.env
+.env.*
+*.key
+*.pem
+*.crt
+*.p12
+*.ovpn
+*.conf
+!compose-examples/*.yml
+backups/
+*.tar
+*.tar.gz
+*.zip
+.DS_Store
+node_modules/
+__pycache__/
