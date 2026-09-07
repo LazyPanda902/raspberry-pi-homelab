@@ -1,44 +1,38 @@
-# Sanitized Docker Compose example.
-# This file is for portfolio documentation only.
-# Replace placeholder values before using.
+# Sanitized teaching example. It is not copied from the live host.
+name: homelab-example
 
 services:
-  glance:
+  dashboard:
     image: glanceapp/glance:latest
-    container_name: glance
     restart: unless-stopped
     ports:
       - "8080:8080"
     volumes:
-      - ./appdata/glance:/app/config
+      - dashboard-data:/app/config
+    read_only: true
+    tmpfs:
+      - /tmp
 
-  uptime-kuma:
-    image: louislam/uptime-kuma:latest
-    container_name: uptime-kuma
+  availability-monitor:
+    image: louislam/uptime-kuma:2
     restart: unless-stopped
     ports:
       - "3001:3001"
     volumes:
-      - ./appdata/uptime-kuma:/app/data
+      - monitor-data:/app/data
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
+  metrics:
+    image: prom/prometheus:latest
     restart: unless-stopped
-    ports:
-      - "9000:9000"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./appdata/portainer:/data
+      - ./example-config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - metrics-data:/prometheus
+    expose:
+      - "9090"
 
-  adguard-home:
-    image: adguard/adguardhome:latest
-    container_name: adguard-home
-    restart: unless-stopped
-    ports:
-      - "3003:3000"
-      # DNS ports are intentionally omitted in this public example.
-      # Add them only in your private compose file.
-    volumes:
-      - ./appdata/adguard/work:/opt/adguardhome/work
-      - ./appdata/adguard/conf:/opt/adguardhome/conf
+volumes:
+  dashboard-data:
+  monitor-data:
+  metrics-data:

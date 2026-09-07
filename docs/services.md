@@ -1,38 +1,28 @@
 # Services
 
-## Core Services
+This inventory was collected from the running Docker engine on 2026-09-07. Docker environment variables and full configuration were not inspected. Health `not-configured` means the image has no Docker health check. It does not by itself mean the service is unhealthy.
 
-| Service | Role |
-|---|---|
-| Portainer | Manage Docker containers and stacks |
-| Uptime Kuma | Monitor service uptime |
-| Dozzle | View container logs |
-| Glance | Dashboard for services and system status |
-| Filebrowser | Web file manager |
+| Name | Role | Category | Runtime state | Health | Restart policy | Exposure classification |
+|---|---|---|---|---|---|---|
+| adguardhome | DNS filtering and query handling | Networking | running | not-configured | unless-stopped | all-interfaces |
+| datequiz-caddy | Reverse proxy for an application | Infrastructure | running | not-configured | unless-stopped | all-interfaces |
+| cadvisor | Container resource metrics | Monitoring | running | healthy | unless-stopped | all-interfaces |
+| node-exporter | Host resource metrics | Monitoring | running | not-configured | unless-stopped | all-interfaces |
+| prometheus | Metrics collection and queries | Monitoring | running | not-configured | unless-stopped | all-interfaces |
+| grafana | Metrics dashboards | Monitoring | running | not-configured | unless-stopped | all-interfaces |
+| uptime-kuma | Service availability checks | Monitoring | running | healthy | unless-stopped | all-interfaces |
+| portainer | Container administration | Management | running | not-configured | unless-stopped | all-interfaces |
+| dozzle | Container log review | Management | running | not-configured | unless-stopped | all-interfaces |
+| filebrowser | Browser-based file management | Management | running | healthy | unless-stopped | all-interfaces |
+| glance | Service dashboard | Management | running | not-configured | unless-stopped | all-interfaces |
+| dealradar-api | Local application API | Applications | running | healthy | unless-stopped | loopback |
+| snowflake | Tor Snowflake proxy | Networking | running | not-configured | unless-stopped | no-published-port |
 
-## Network Services
+## Exposure definitions
 
-| Service | Role |
-|---|---|
-| AdGuard Home | DNS filtering and DNS query visibility |
+- `all-interfaces` means at least one Docker host port binding used a wildcard host address.
+- `loopback` means the published host binding was restricted to loopback.
+- `specific-interface` means a non-wildcard and non-loopback host binding was present. The address is intentionally not published.
+- `no-published-port` means Docker reported no host port binding.
 
-## Media Services
-
-| Service | Role |
-|---|---|
-| Plex | Media streaming server |
-| Jellyseerr | Media request portal |
-| qBittorrent | Download client |
-| Sonarr | TV library automation |
-| Radarr | Movie library automation |
-| Prowlarr | Indexer management |
-| Tautulli | Plex monitoring and watch history |
-
-## What I Learned
-
-- how to organize Docker app data
-- how to troubleshoot port conflicts
-- how to monitor service health
-- how to track container logs
-- how to handle DNS filtering
-- how to document a recoverable homelab setup
+These classifications do not establish reachability through a firewall, authentication strength, TLS use, or application authorization. Those require separate checks.
