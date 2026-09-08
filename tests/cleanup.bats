@@ -34,6 +34,24 @@ setup() {
   [ "$status" -eq 1 ]
 }
 
+@test "refuses descendants of etc" {
+  run "$SCRIPT" --target /etc/ssl --execute
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"protected system tree"* ]]
+}
+
+@test "refuses descendants of usr" {
+  run "$SCRIPT" --target /usr/bin --execute
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"protected system tree"* ]]
+}
+
+@test "refuses descendants of var" {
+  run "$SCRIPT" --target /var/log --execute
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"protected system tree"* ]]
+}
+
 @test "refuses empty input" {
   run "$SCRIPT" --target ""
   [ "$status" -eq 2 ]
@@ -55,6 +73,12 @@ setup() {
   run "$SCRIPT" --target "$TARGET" --older-than 7 --execute
   [ "$status" -eq 0 ]
   [[ "$output" == *"Mode: execute"* ]]
+}
+
+@test "refuses unapproved filesystem trees by default" {
+  run "$SCRIPT" --target /root --execute
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"outside an approved cleanup tree"* ]]
 }
 
 @test "does not follow a target symlink" {

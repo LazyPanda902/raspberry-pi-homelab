@@ -102,7 +102,7 @@ bats tests/
 docker compose -f compose-examples/docker-compose.example.yml config
 ```
 
-The suite contains 28 Bats tests. CI runs all four checks and validates Markdown links.
+The suite contains 32 Bats tests. CI runs all four checks and validates Markdown links.
 
 ## Roadmap
 

@@ -65,8 +65,18 @@ canonical_target=$(readlink -f -- "$target") || {
 }
 
 case $canonical_target in
-  /|/home|/mnt|/mnt/nvme|/etc|/usr|/var)
+  /|/home|/mnt|/mnt/nvme|/tmp)
     printf 'Error: refusing protected target: %s\n' "$canonical_target" >&2
+    exit 1
+    ;;
+  /etc|/etc/*|/usr|/usr/*|/var|/var/*)
+    printf 'Error: refusing protected system tree: %s\n' "$canonical_target" >&2
+    exit 1
+    ;;
+  /home/*|/mnt/nvme/*|/tmp/*)
+    ;;
+  *)
+    printf 'Error: target is outside an approved cleanup tree: %s\n' "$canonical_target" >&2
     exit 1
     ;;
 esac
