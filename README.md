@@ -1,218 +1,115 @@
-# Raspberry Pi Homelab & Media Server
+# Raspberry Pi Homelab
 
-A sanitized portfolio version of a self-hosted Raspberry Pi homelab built for Linux administration, Docker, networking, DNS filtering, monitoring, dashboards, media services, and recovery planning.
+This project demonstrates verified Linux, Docker, storage, DNS, monitoring, and support practices on a Raspberry Pi 5.
 
-This repository documents the architecture and operating practices without publishing secrets, private domains, production `.env` files, WireGuard keys, API tokens, or personal network details.
+[![CI](https://img.shields.io/github/actions/workflow/status/LazyPanda902/raspberry-pi-homelab/ci.yml?label=CI)](https://github.com/LazyPanda902/raspberry-pi-homelab/actions)
+![Bash](https://img.shields.io/badge/Bash-5.2-4EAA25?logo=gnubash&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## What this project shows
+## What problem this solves
 
-This homelab demonstrates practical infrastructure and support skills:
+A small server can host many useful services, but support becomes difficult when nobody can quickly answer basic questions. Is the host healthy? Are containers running? Is persistent state on the expected disk? Will a service restart after a reboot? Which interfaces expose an administrative page?
 
-- Linux server administration on Raspberry Pi hardware
-- NVMe-backed storage layout and service persistence
-- Docker and Docker Compose service management
-- DNS filtering with AdGuard Home
-- Uptime monitoring with Uptime Kuma
-- Container management with Portainer
-- Container log review with Dozzle
-- Dashboard organization with Glance
-- Media stack planning with Plex, Sonarr, Radarr, Prowlarr, qBittorrent, Jellyseerr, and Tautulli
-- Backup and recovery documentation
-- Sanitized public documentation practices
-- Troubleshooting ports, mounts, permissions, and container restarts
+This repository provides a read-only audit, safe cleanup tooling, tests, and operating notes for answering those questions. It also records a change method for troubleshooting containers, checking logs, validating storage, monitoring failures, and rolling back an unsuccessful change.
 
-## Why this repo exists
+## Demo
 
-The live homelab is a private system. This public repository is the safe portfolio version.
+This shortened output was generated on the Raspberry Pi with `scripts/homelab-audit.sh --public`:
 
-It shows the structure, service choices, recovery notes, and security practices without exposing real production configuration. The goal is to document the engineering work clearly while keeping operational secrets private.
+```text
+# Platform
+OS: Debian GNU/Linux 13 (trixie)
+Architecture: aarch64
+Model: Raspberry Pi 5 Model B Rev 1.1
+Memory: total=7.9Gi, available=5.7Gi
 
-## Core features
+# Storage
+Root storage: size=117G, used=70G, available=43G, utilization=63%
+NVMe device: present
+NVMe storage: size=916G, used=31G, available=839G, utilization=4%
 
-- Sanitized Docker Compose example
-- Service inventory and role breakdown
-- High-level architecture notes
-- Backup and recovery checklist
-- Security publishing checklist
-- Example cleanup script
-- NVMe storage layout documentation
-- Notes for monitoring and dashboard services
-- Public-safe README and docs structure
+# Docker
+Docker: available
+Docker data root: /mnt/nvme/docker-data
+Running containers: 13
+
+# Host services
+Failed systemd units: 0
+WireGuard interface: present
+Ollama service: active
+```
+
+The full captured report is in [docs/sample-output.md](docs/sample-output.md).
 
 ## Hardware and platform
 
-| Component | Details |
+| Component | Verified detail |
 |---|---|
-| Server | Raspberry Pi |
-| Storage | NVMe-backed storage |
-| Boot | SD card |
-| Operating system | Debian/Linux |
-| Container runtime | Docker |
-| Orchestration | Docker Compose |
+| Board | Raspberry Pi 5 Model B Rev 1.1 |
+| Operating system | Debian GNU/Linux 13 |
+| Architecture | ARM64, reported as aarch64 |
+| Memory | Approximately 8 GB |
+| Boot and root | SD card |
+| Persistent service storage | Approximately 1 TB NVMe mounted at `/mnt/nvme` |
+| Docker data root | `/mnt/nvme/docker-data` |
 
-## Service overview
+## Services
 
-| Service | Purpose |
-|---|---|
-| Plex | Media streaming server |
-| Jellyseerr | Media request management |
-| qBittorrent | Download client |
-| Sonarr | TV library automation |
-| Radarr | Movie library automation |
-| Prowlarr | Indexer management |
-| Tautulli | Plex monitoring and watch history |
-| AdGuard Home | DNS filtering and DNS query visibility |
-| Glance | Homelab dashboard |
-| Portainer | Docker container and stack management |
-| Uptime Kuma | Service uptime monitoring |
-| Dozzle | Container log viewer |
-| Filebrowser | Browser-based file access |
+The following inventory was verified on 2026-09-07. Exposure describes host port binding, not application authentication or firewall policy.
 
-## Storage layout
+| Service | Purpose | Exposure classification | Restart policy |
+|---|---|---|---|
+| AdGuard Home | DNS filtering | all-interfaces | unless-stopped |
+| Caddy | Reverse proxy for one application | all-interfaces | unless-stopped |
+| cAdvisor | Container metrics | all-interfaces | unless-stopped |
+| Node Exporter | Host metrics | all-interfaces | unless-stopped |
+| Prometheus | Metrics collection | all-interfaces | unless-stopped |
+| Grafana | Metrics dashboards | all-interfaces | unless-stopped |
+| Uptime Kuma | Availability monitoring | all-interfaces | unless-stopped |
+| Portainer | Container management | all-interfaces | unless-stopped |
+| Dozzle | Container log review | all-interfaces | unless-stopped |
+| Filebrowser | Browser-based file management | all-interfaces | unless-stopped |
+| Glance | Service dashboard | all-interfaces | unless-stopped |
+| DealRadar API | Local application API | loopback | unless-stopped |
+| Snowflake | Tor Snowflake proxy | no-published-port | unless-stopped |
 
-Sanitized example:
+See [docs/services.md](docs/services.md) for categories, runtime state, and health-check status.
 
-```text
-/mnt/nvme
-├── appdata/
-├── downloads/
-└── media/
-    ├── movies/
-    ├── tv/
-    ├── music/
-    └── photos/
-```
+## Architecture
 
-The main design goal is to keep persistent application data outside containers, so services can be recreated without losing configuration or state.
+The [architecture guide](docs/architecture.md) includes a Mermaid diagram of the LAN, WireGuard path, DNS, reverse proxy, containers, monitoring, Ollama, and NVMe storage.
 
-## Repository structure
+## Operations
 
-```text
-README.md
-docs/
-  architecture.md
-  services.md
-  backup-and-recovery.md
-  security-notes.md
-compose-examples/
-  docker-compose.example.yml
-scripts/
-  media-cleanup-example.sh
-.gitignore
-```
-
-## Example Docker Compose services
-
-The public compose example includes safe placeholder services:
-
-- Glance
-- Uptime Kuma
-- Portainer
-- AdGuard Home
-
-The example is intentionally incomplete for production use. DNS ports, private domains, secrets, and real paths should be handled only in private configuration.
-
-Example:
-
-```bash
-cd compose-examples
-docker compose -f docker-compose.example.yml config
-```
-
-This validates Compose syntax without starting services.
-
-## Example cleanup script
-
-The repository includes a sanitized cleanup script:
-
-```text
-scripts/media-cleanup-example.sh
-```
-
-It is a dry-run style template. Review and modify paths before using it on a real server.
-
-Example syntax check:
-
-```bash
-bash -n scripts/media-cleanup-example.sh
-```
+Changes follow a small-step method: inspect, back up, record a baseline, change one component, validate, restart only what changed, check health and logs, verify dependencies, and roll back on failure. Commands and verification points are in [docs/operations.md](docs/operations.md).
 
 ## Backup and recovery
 
-The recovery plan is documented in:
+The recovery plan separates configuration from container images, treats the NVMe mount as a startup dependency, and restores DNS, proxy, monitoring, management, then applications. No tested-restore date or off-device backup target is claimed because neither could be verified safely. See [docs/backup-and-recovery.md](docs/backup-and-recovery.md).
 
-```text
-docs/backup-and-recovery.md
-```
+## Security
 
-Recovery checklist summary:
+Verified controls include loopback-only Ollama, a present WireGuard interface, one encrypted DNS-over-HTTPS upstream, public-repo sanitization, excluded `.env` files, and persistent Docker state on NVMe. No DNS-over-TLS upstream was found.
 
-1. Install Docker.
-2. Install Docker Compose.
-3. Mount NVMe storage.
-4. Restore compose files.
-5. Restore appdata.
-6. Start services.
-7. Check service ports.
-8. Check Uptime Kuma monitors.
-9. Check AdGuard DNS.
-10. Check dashboard links.
+Several administrative web services currently publish on all interfaces. This is documented as exposure, not as a security strength. Authentication and firewall behavior were not inferred from port bindings. See [docs/security.md](docs/security.md).
 
-## Security and privacy
-
-This repo is sanitized for public portfolio use.
-
-Never publish:
-
-- passwords
-- API keys
-- private keys
-- real domains
-- DuckDNS tokens
-- WireGuard private keys
-- raw client VPN configs
-- personal data
-- production `.env` files
-- full production compose files with secrets
-
-Before pushing changes, run a local secret scan:
+## Testing
 
 ```bash
-grep -R "password\|passwd\|secret\|token\|api\|key\|duckdns\|private" .
-```
-
-Also review Git history if a secret was ever committed.
-
-## Validation checklist
-
-Because this repository is documentation and sanitized configuration, there is no application test suite or CI pipeline yet.
-
-Recommended manual checks before publishing updates:
-
-```bash
+bash -n scripts/*.sh
+shellcheck scripts/*.sh
+bats tests/
 docker compose -f compose-examples/docker-compose.example.yml config
-bash -n scripts/media-cleanup-example.sh
-grep -R "password\|passwd\|secret\|token\|api\|key\|duckdns\|private" .
 ```
 
-Future improvement: add GitHub Actions CI to run Compose validation, shell syntax checks, and secret-pattern scanning.
+The suite contains 32 Bats tests. CI runs all four checks and validates Markdown links.
 
-## Lessons learned
+## Roadmap
 
-This homelab helped build practical experience with:
-
-- organizing Docker app data
-- troubleshooting port conflicts
-- maintaining service dashboards
-- reviewing container logs
-- documenting recovery steps
-- separating public examples from private production configuration
-- keeping secrets out of GitHub
-
-## Resume bullet
-
-Built and maintained a Raspberry Pi homelab with NVMe-backed storage and Dockerized services for media management, DNS filtering, monitoring, dashboards, and container administration using Linux, Docker, Docker Compose, Portainer, Uptime Kuma, AdGuard Home, and Glance.
+- Restrict administrative services to loopback, a defined LAN policy, or VPN-specific bindings where appropriate.
+- Expand restore verification automation and record the first completed restore exercise.
+- Add automated configuration-drift reporting without collecting secrets.
 
 ## License
 
-No open-source license is currently included. Treat this repository as portfolio documentation unless a license is added later.
+MIT. See [LICENSE](LICENSE).
