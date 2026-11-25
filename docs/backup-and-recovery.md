@@ -1,6 +1,6 @@
 # Backup and Recovery
 
-This is a recovery procedure, not a claim of a completed restore exercise. The inspected evidence confirms NVMe-backed Docker state and repository-held public examples. It does not safely establish an off-device backup destination, backup schedule, retention policy, or tested-restore date.
+This is a recovery procedure, not a claim of completed disaster recovery. A scheduled local backup service completed successfully on 2026-11-25 following correction of its NVMe target validation. A successful service exit alone does not establish full recovery. The local backup shares the NVMe failure domain; no off-device backup is claimed.
 
 ## Data to protect
 
@@ -27,7 +27,7 @@ Container images should normally be pulled again from their registries. Locally 
 7. Generate checksums and store them separately from the archive.
 8. Restart stopped services and verify health, logs, and dependencies.
 
-No backup destination is named here because one was not verified for safe public disclosure.
+The local backup target is NVMe-backed. Exact private paths and configuration are intentionally omitted.
 
 ## Restore order
 
@@ -55,4 +55,4 @@ Compare the new audit with a known baseline. Confirm expected container count, r
 
 ## Restore evidence gap
 
-No safe evidence of a completed restore drill was found during this rebuild. The roadmap includes automating and recording restore verification. Until that happens, this document should be treated as a reviewed procedure only.
+A complete application restore and recovery on replacement storage have not been established by the successful backup exit status. Continue to record integrity checks and isolated restoration evidence; treat this document as a recovery procedure, not a full recovery guarantee.
