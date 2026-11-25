@@ -39,7 +39,7 @@ WireGuard interface: present
 Ollama service: active
 ```
 
-The full captured report is in [docs/sample-output.md](docs/sample-output.md).
+This is a historical example, not a live status report. The full captured report is in [docs/sample-output.md](docs/sample-output.md).
 
 ## Hardware and platform
 
@@ -85,7 +85,7 @@ Changes follow a small-step method: inspect, back up, record a baseline, change 
 
 ## Backup and recovery
 
-The recovery plan separates configuration from container images, treats the NVMe mount as a startup dependency, and restores DNS, proxy, monitoring, management, then applications. No tested-restore date or off-device backup target is claimed because neither could be verified safely. See [docs/backup-and-recovery.md](docs/backup-and-recovery.md).
+The recovery plan separates configuration from container images, treats the NVMe mount as a startup dependency, and restores DNS, proxy, monitoring, management, then applications. A local backup service completed successfully on 2026-11-25 following correction of its NVMe target validation. This confirms successful service execution, not a full disaster-recovery restore. The local backup shares the physical NVMe failure domain. See [docs/backup-and-recovery.md](docs/backup-and-recovery.md).
 
 ## Security
 
@@ -107,7 +107,7 @@ The suite contains 32 Bats tests. CI runs all four checks and validates Markdown
 ## Roadmap
 
 - Restrict administrative services to loopback, a defined LAN policy, or VPN-specific bindings where appropriate.
-- Expand restore verification automation and record the first completed restore exercise.
+- Expand restore verification automation and document an end-to-end restore exercise.
 - Add automated configuration-drift reporting without collecting secrets.
 
 ## License
